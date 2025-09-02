@@ -72,7 +72,7 @@
                 </div>
     
                 <!-- Weather Info Section -->
-                <div class="flex-grow min-h-[160px] flex flex-col justify-center text-left">
+                <div class="flex-grow min-h-[160px] flex flex-col justify-center text-center">
                     <div id="weather-content">
                         <!-- Weather info will be injected here -->
                     </div>
@@ -170,7 +170,7 @@
 
             const weatherHTML = `
                 <h2 class="text-4xl font-bold">${name}, ${sys.country}</h2>
-                <div class="flex items-center -ml-2">
+                <div class="flex items-center justify-center -ml-2">
                     <img src="${iconUrl}" alt="${description}" class="w-20 h-20">
                     <p class="text-6xl font-bold">${temperature}°C</p>
                 </div>
