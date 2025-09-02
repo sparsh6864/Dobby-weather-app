@@ -34,7 +34,7 @@
 </head>
 <body class="bg-gradient-to-br from-cyan-400 to-blue-600 min-h-screen flex items-center justify-center p-4">
 
-    <div class="w-full max-w-lg mx-auto">
+    <div class="w-full max-w-2xl mx-auto">
         <!-- Heading -->
         <h1 class="text-4xl font-bold text-white text-center mb-4 drop-shadow-lg">Dobby's Weather App</h1>
 
@@ -63,26 +63,29 @@
         </div>
 
         <!-- Mascot and Weather Board Container -->
-        <div id="weather-display" class="relative hidden flex items-center justify-center">
-            <!-- Mascot Image -->
-            <div class="relative w-40 h-40 z-10 flex-shrink-0 -mr-5">
-                <img src="mascot.png" alt="Mascot" class="w-full h-full object-contain drop-shadow-xl">
-            </div>
-
+        <div id="weather-display" class="relative hidden">
             <!-- Weather Board -->
-            <div class="weather-card w-full rounded-2xl shadow-2xl p-6 text-center text-gray-800 relative z-0 min-h-[190px] flex flex-col justify-center">
-                <div id="weather-content">
-                    <!-- Weather info will be injected here -->
+            <div class="weather-card w-full rounded-2xl shadow-2xl p-6 flex items-center gap-6">
+                <!-- Mascot Image -->
+                <div class="relative w-36 h-36 flex-shrink-0">
+                    <img src="mascot.png" alt="Mascot" class="w-full h-full object-contain drop-shadow-lg">
                 </div>
-                <div id="loading" class="hidden">
-                     <svg class="animate-spin h-8 w-8 text-blue-500 mx-auto" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                    </svg>
-                    <p class="mt-2">Fetching weather...</p>
-                </div>
-                 <div id="error-message" class="hidden text-red-600 font-semibold">
-                    <!-- Error messages will be shown here -->
+    
+                <!-- Weather Info Section -->
+                <div class="flex-grow min-h-[160px] flex flex-col justify-center text-left">
+                    <div id="weather-content">
+                        <!-- Weather info will be injected here -->
+                    </div>
+                    <div id="loading" class="hidden">
+                         <svg class="animate-spin h-8 w-8 text-blue-500 mx-auto" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                        </svg>
+                        <p class="mt-2 text-center">Fetching weather...</p>
+                    </div>
+                     <div id="error-message" class="hidden text-red-600 font-semibold">
+                        <!-- Error messages will be shown here -->
+                    </div>
                 </div>
             </div>
         </div>
@@ -166,12 +169,12 @@
             const description = weather[0].description.replace(/\b\w/g, l => l.toUpperCase()); // Capitalize each word
 
             const weatherHTML = `
-                <h2 class="text-3xl font-bold">${name}, ${sys.country}</h2>
-                <div class="flex items-center justify-center -my-2">
-                    <img src="${iconUrl}" alt="${description}" class="w-24 h-24">
+                <h2 class="text-4xl font-bold">${name}, ${sys.country}</h2>
+                <div class="flex items-center -ml-2">
+                    <img src="${iconUrl}" alt="${description}" class="w-20 h-20">
                     <p class="text-6xl font-bold">${temperature}°C</p>
                 </div>
-                <p class="text-xl text-gray-600">${description}</p>
+                <p class="text-2xl text-gray-600">${description}</p>
             `;
             weatherContent.innerHTML = weatherHTML;
         }
