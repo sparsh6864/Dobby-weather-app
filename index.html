@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mascot Weather App</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+        }
+        .weather-card {
+            background-color: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        .preset-city-btn {
+            background-color: rgba(255, 255, 255, 0.2);
+            transition: all 0.3s ease;
+        }
+        .preset-city-btn:hover {
+            background-color: rgba(255, 255, 255, 0.4);
+            transform: translateY(-2px);
+        }
+        /* Hide the default spinner from number input */
+        input[type='search']::-webkit-search-decoration,
+        input[type='search']::-webkit-search-cancel-button,
+        input[type='search']::-webkit-search-results-button,
+        input[type='search']::-webkit-search-results-decoration {
+            -webkit-appearance:none;
+        }
+    </style>
+</head>
+<body class="bg-gradient-to-br from-cyan-400 to-blue-600 min-h-screen flex items-center justify-center p-4">
+
+    <div class="w-full max-w-md mx-auto">
+        <!-- Search Form -->
+        <div class="bg-white/30 p-4 rounded-2xl shadow-lg mb-6">
+             <form id="search-form" class="flex items-center gap-2">
+                <input type="search" id="city-input" placeholder="Enter a city name..." class="w-full px-4 py-3 bg-white/80 text-gray-800 placeholder-gray-500 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-300 transition">
+                <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-5 rounded-lg transition-transform transform hover:scale-105 shadow-md">
+                    Search
+                </button>
+            </form>
+        </div>
+        
+        <!-- Preset Cities -->
+        <div class="text-center mb-8">
+            <p class="text-white/80 mb-3 text-sm">Or try one of these:</p>
+            <div id="preset-cities" class="flex flex-wrap gap-3 justify-center">
+                <button class="preset-city-btn text-white font-semibold py-2 px-4 rounded-full shadow">New York</button>
+                <button class="preset-city-btn text-white font-semibold py-2 px-4 rounded-full shadow">London</button>
+                <button class="preset-city-btn text-white font-semibold py-2 px-4 rounded-full shadow">Tokyo</button>
+                <button class="preset-city-btn text-white font-semibold py-2 px-4 rounded-full shadow">Paris</button>
+            </div>
+        </div>
+
+        <!-- Mascot and Weather Board Container -->
+        <div id="weather-display" class="relative hidden">
+            <!-- Weather Board -->
+            <div class="weather-card w-full rounded-2xl shadow-2xl p-6 text-center text-gray-800 relative z-10 mb-[-50px]">
+                <div id="weather-content">
+                    <!-- Weather info will be injected here -->
+                </div>
+                <div id="loading" class="hidden">
+                     <svg class="animate-spin h-8 w-8 text-blue-500 mx-auto" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    </svg>
+                    <p class="mt-2">Fetching weather...</p>
+                </div>
+                 <div id="error-message" class="hidden text-red-600 font-semibold">
+                    <!-- Error messages will be shown here -->
+                </div>
+            </div>
+
+            <!-- Mascot Image -->
+            <div class="relative w-48 h-48 mx-auto z-20">
+                <img src="mascot.jpg" alt="Mascot" class="w-full h-full object-contain drop-shadow-xl">
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // --- CONFIGURATION ---
+        // IMPORTANT: Replace "YOUR_API_KEY" with your actual key from OpenWeatherMap
+        const apiKey = "6d055e39ee237af35ca066f35474e9df"; 
+        
+        // --- DOM ELEMENTS ---
+        const searchForm = document.getElementById('search-form');
+        const cityInput = document.getElementById('city-input');
+        const weatherDisplay = document.getElementById('weather-display');
+        const weatherContent = document.getElementById('weather-content');
+        const loadingIndicator = document.getElementById('loading');
+        const errorMessage = document.getElementById('error-message');
+        const presetCitiesContainer = document.getElementById('preset-cities');
+
+        // --- EVENT LISTENERS ---
+        searchForm.addEventListener('submit', event => {
+            event.preventDefault();
+            const city = cityInput.value.trim();
+            if (city) {
+                getWeather(city);
+            }
+        });
+
+        presetCitiesContainer.addEventListener('click', event => {
+            if (event.target.tagName === 'BUTTON') {
+                const city = event.target.textContent;
+                cityInput.value = city; // Optional: update input field
+                getWeather(city);
+            }
+        });
+
+        // --- API & UI FUNCTIONS ---
+        
+        /**
+         * Fetches weather data from the OpenWeatherMap API for a given city.
+         * @param {string} city - The name of the city to get weather for.
+         */
+        async function getWeather(city) {
+            // 1. Show display and loading indicator, hide previous results/errors
+            weatherDisplay.classList.remove('hidden');
+            weatherContent.innerHTML = '';
+            errorMessage.classList.add('hidden');
+            loadingIndicator.classList.remove('hidden');
+
+            try {
+                // 2. Fetch data from the API
+                const apiUrl = `https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${apiKey}&units=metric`;
+                const response = await fetch(apiUrl);
+
+                if (!response.ok) {
+                    throw new Error(`City not found (${response.status})`);
+                }
+
+                const data = await response.json();
+                
+                // 3. Update UI with fetched data
+                displayWeather(data);
+
+            } catch (error) {
+                console.error("Error fetching weather:", error);
+                displayError(error.message);
+            } finally {
+                // 4. Hide loading indicator regardless of outcome
+                loadingIndicator.classList.add('hidden');
+            }
+        }
+
+        /**
+         * Displays the weather data on the UI.
+         * @param {object} data - The weather data object from the API.
+         */
+        function displayWeather(data) {
+            const { name, main, weather, sys } = data;
+            const iconUrl = `https://openweathermap.org/img/wn/${weather[0].icon}@2x.png`;
+            const temperature = Math.round(main.temp);
+            const description = weather[0].description.replace(/\b\w/g, l => l.toUpperCase()); // Capitalize each word
+
+            const weatherHTML = `
+                <h2 class="text-3xl font-bold">${name}, ${sys.country}</h2>
+                <div class="flex items-center justify-center -my-2">
+                    <img src="${iconUrl}" alt="${description}" class="w-24 h-24">
+                    <p class="text-6xl font-bold">${temperature}°C</p>
+                </div>
+                <p class="text-xl text-gray-600">${description}</p>
+            `;
+            weatherContent.innerHTML = weatherHTML;
+        }
+
+        /**
+         * Displays an error message on the UI.
+         * @param {string} message - The error message to display.
+         */
+        function displayError(message) {
+            errorMessage.textContent = `Oops! Could not get weather. ${message}. Please try again.`;
+            errorMessage.classList.remove('hidden');
+        }
+    </script>
+</body>
+</html>
+
